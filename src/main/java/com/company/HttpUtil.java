@@ -24,7 +24,7 @@ public class HttpUtil {
         return GSON.fromJson(response.body(), User.class);
     }
 
-    public static void sendPUT(URI uri, User user) throws IOException, InterruptedException {
+    public static User sendPUT(URI uri, User user) throws IOException, InterruptedException {
         final String requestBody = GSON.toJson(user);
         final HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
@@ -32,6 +32,8 @@ public class HttpUtil {
                 .PUT(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
         final HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println("Response status cod " +response.statusCode());
+        return GSON.fromJson(response.body(), User.class);
     }
 
     public static void sendDELETE(URI uri) throws IOException, InterruptedException {

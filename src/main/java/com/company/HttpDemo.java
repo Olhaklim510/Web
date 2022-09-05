@@ -8,33 +8,32 @@ import java.util.*;
 
 public class HttpDemo {
     private static final String USERS_URL = "https://jsonplaceholder.typicode.com/users";
-    private static final String POSTS_URL = "https://jsonplaceholder.typicode.com/users/1/posts";
-    private static final String COMMENTS_URL = "https://jsonplaceholder.typicode.com/posts";
+    private static final String POSTS_URL = "https://jsonplaceholder.typicode.com/posts";
     private static final String RELATIVE_PATH = "src/main/resources";
 
     public static User createNewUser() {
         User user = new User();
-        user.id = 715;
-        user.name = "David";
-        user.username = "Dav";
-        user.email = "David@gmail.com";
+        user.setId(715);
+        user.setName("David");
+        user.setUsername("Dav");
+        user.setEmail("David@gmail.com");
         Adress adress = new Adress();
-        adress.street = "Fulton";
-        adress.suite = "Apt. 700";
-        adress.city = "Manhattan";
-        adress.zipcode = "10038";
+        adress.setStreet("Fulton");
+        adress.setSuite("Apt. 700");
+        adress.setCity("Manhattan");
+        adress.setZipcode("10038");
         Geo geo = new Geo();
-        geo.lat = "404235";
-        geo.lng = "740024";
-        adress.geo = geo;
-        user.address = adress;
-        user.phone = "1-255-859-5263";
-        user.website = "david.com";
+        geo.setLat("404235");
+        geo.setLng("740024");
+        adress.setGeo(geo);
+        user.setAddress(adress);
+        user.setPhone("1-255-859-5263");
+        user.setWebsite("david.com");
         Company company = new Company();
-        company.nameCompany = "ABC";
-        company.catchPhrase = "We work for you";
-        company.bs = "API";
-        user.company = company;
+        company.setNameCompany("ABC");
+        company.setCatchPhrase("We work for you");
+        company.setBs("API");
+        user.setCompany(company);
 
         return user;
     }
@@ -47,9 +46,13 @@ public class HttpDemo {
         System.out.println("//TASK 1\n//1.1\n" + userCreated);
 
         //1.2
-        userCreated.name = "Alex";
-        HttpUtil.sendPUT(URI.create(String.format("%s?id=%d", USERS_URL, userCreated.getId())), userCreated);
-        System.out.println("\n//1.2\n" + userCreated);
+        System.out.println("\n//1.2\nPlease enter the ID of the user whose you want to rename.");
+        int userId = new Scanner(System.in).nextInt();
+        User userForRename = HttpUtil.sendGET_User(URI.create(String.format("%s/%d", USERS_URL, userId)));
+        System.out.println("User before rename: " + userForRename);
+        userForRename.setName("Alex");
+        User userAfterRename = HttpUtil.sendPUT(URI.create(String.format("%s/%d", USERS_URL, userId)), userForRename);
+        System.out.println("User after rename: " + userAfterRename);
 
         //1.3
         System.out.println("\n//1.3");
@@ -64,7 +67,7 @@ public class HttpDemo {
         System.out.println("\n//1.5\nPlease enter the ID of the user you want to find.");
         int userId1 = new Scanner(System.in).nextInt();
         final User userById = HttpUtil.sendGET_User(URI.create(String.format("%s/%d", USERS_URL, userId1)));
-        if (userById.id == 0) {
+        if (userById.getId() == 0) {
             System.out.println("This id doesn't exist.");
         } else {
             System.out.println(userById);
@@ -85,20 +88,19 @@ public class HttpDemo {
         }
 
         //TASK 2
-        List<Post> allPosts = HttpUtil.sendGET_ALL_POSTS(URI.create(POSTS_URL));
-        //System.out.println("\nTASK2");
+        System.out.println("\n//TASK2\nPlease enter the ID of the user whose comments you are interested.");
+        int userId2 = new Scanner(System.in).nextInt();
+        List<Post> allPosts = HttpUtil.sendGET_ALL_POSTS(URI.create(String.format("%s/%d/%s",
+                USERS_URL, userId2, "posts")));
         ArrayList<Integer> arrayListPost = new ArrayList<>(allPosts.size());
         int k = 0;
         while (k < allPosts.size()) {
-            arrayListPost.add(k, allPosts.get(k).id);
+            arrayListPost.add(k, allPosts.get(k).getId());
             k++;
         }
         Integer maxIdPost = Collections.max(arrayListPost);
-
-        System.out.println("\n//TASK2\nPlease enter the ID of the user whose comments you are interested in on the latest post.");
-        int userId2 = new Scanner(System.in).nextInt();
-        Comment[] comment = HttpUtil.sendGET_MAX_Comment_BY_ID_USER(URI.create(String.format("%s/%d/%s?id=%d",
-                COMMENTS_URL, maxIdPost, "comments", userId2)));
+        Comment[] comment = HttpUtil.sendGET_MAX_Comment_BY_ID_USER(URI.create(String.format("%s/%d/%s",
+                POSTS_URL, maxIdPost, "comments")));
         if (comment.length == 0) {
             System.out.println("This id doesn't exist.");
         } else {
@@ -123,7 +125,7 @@ public class HttpDemo {
             System.out.println("This id doesn't exist.");
         } else {
             for (Todo todo : todos) {
-                if (todo.completed.equals("false")) {
+                if (!todo.isCompleted()) {
                     System.out.println(todo);
                 }
             }
